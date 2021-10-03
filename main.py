@@ -157,3 +157,8 @@ a.create_and_attach_volume_from_snapshot()
 
 # IN THIS POINT: we attached the new volume to the new ec2, and mounted it the the commands file.
 
+# todo: get device name probably with psutil
+# todo: see ssh thing in vuls- so we wont download the vuls just to the new volume.
+# todo: integrate the elastic code and open elastic server with port forwarding for the scan output
+# todo: run the thing after changing device name, GroupName (in this file)
+
