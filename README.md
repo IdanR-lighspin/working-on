@@ -2,9 +2,8 @@
 running the main now:
 - create new ec2.
 - install all the things there.
-- the creator class attaches the wanted volume to the ec2 we created.
+- the creator class attaches the wanted volume to the ec2 we created. then mount it to local folder from the command file.
 
 
 to do:
-- need to mount the new volume.
 - all the things that are commented in the code.
