@@ -16,6 +16,8 @@ ec2 = boto3.client('ec2')
 
 region = "us-east-2"
 response = ec2.describe_vpcs()
+
+
 def get_vpc():
     # vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')  # giving a wrong vpc
     vpc_id = ""
@@ -60,7 +62,7 @@ def create_ec2(security_group_id, key_pair_name):
 
     ec2 = boto3.resource('ec2')
     # create a file to store the key locally
-    outfile = open(key_pair_name+'.pem','w')
+    outfile = open(key_pair_name+'.pem', 'w')
     key_pair = ec2.create_key_pair(KeyName=key_pair_name)
 
     # capture the key and store it in a file
@@ -79,8 +81,8 @@ def create_ec2(security_group_id, key_pair_name):
          ]
      )
     instance_id_ = str(instances[0])  # output: [ec2.Instance(id='i-0e379dc5b2efc913c')]
-    instance_id_ = instance_id_.replace("ec2.Instance(id='","")
-    instance_id_ = instance_id_.replace("')","")
+    instance_id_ = instance_id_.replace("ec2.Instance(id='", "")
+    instance_id_ = instance_id_.replace("')", "")
     print(instance_id_)
     return instance_id_
 
@@ -99,31 +101,37 @@ def instance_id_ip(instance_id):
     return ec2_global_ip
 
 
-def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass):
+def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, destination_file_path):
+    """
+    transferring and running python file in the new ec2 machine (or another machine if wanted..)
+    :param ec2_global_ip:
+    :param key_pair_name:
+    :param sudo_pass:
+    :return:
+    """
     # IMPORTANT- without chmod 400 (etc) the ssh will not work due to too open access to the key file
-    # sudo_pass = 'Idan2408'  # sudo password of the machine
     sudo_password = "echo " + sudo_pass + " | sudo -S "
     commands1 = sudo_password + ";" + "sudo chmod 400 /"+key_pair_name+".pem"
     output = subprocess.getoutput(commands1)
 
-    username = "ubuntu"
+    username = "ubuntu"  # may get this as parameter later on
     ssh = paramiko.SSHClient()
     private_key = paramiko.RSAKey.from_private_key_file(key_pair_name + ".pem")
     ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(hostname=ec2_global_ip, port=22, username=username, pkey=private_key)
     sftp = ssh.open_sftp()
-    sftp.put("/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")  # put is writing over
+    sftp.put(file_path_to_pass, destination_file_path)  # put is writing over
     sftp.close()
 
     # running the file:
-    stdin_, stdout_, stderr_ = ssh.exec_command("python3 test.py", get_pty=True)
+    stdin_, stdout_, stderr_ = ssh.exec_command("python3 " + destination_file_path, get_pty=True)
     time.sleep(5)  # don't know why, but prevents crashing :) (well, apparently just sometimes. need to check more.)
     stdout_.channel.recv_exit_status()
     lines = stdout_.readlines()
     for line in lines:
         print(line)
 
-"""
+
 key_pair_name = "idan8"  # without .pem
 sudo_password = "Idan2408"
 
@@ -138,14 +146,14 @@ instance_id = "i-073ae94f0d3e7b4d3"
 
 global_ip = instance_id_ip(instance_id)
 
-ssh_operations(global_ip, key_pair_name, sudo_password)
-"""
 a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
+
+ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")
+
+# IN THIS POINT: we have new ec2 running and all the things installed there.
 # after running this once, need to change device name (there are list of available names. ill handle it later
 # need to run just this function:
 a.create_and_attach_volume_from_snapshot()
-"""
-commands to run in the new machine for mount:
-cd /
-sudo mount /dev/xvdw1 /newvolume/
-"""
+
+# IN THIS POINT: we attached the new volume to the new ec2, and mounted it the the commands file.
+
