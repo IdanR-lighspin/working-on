@@ -72,10 +72,11 @@ class Creator:
         # volume_id = new_volume.id
         volume = self.ec2.Volume(volume_id)
         volume.attach_to_instance(
-            Device='/dev/xvdw',
+            Device='/dev/xvdt',
             InstanceId=self.instance_id_to_attach
         )
         print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
+
 
 
 a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
@@ -83,12 +84,15 @@ a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (regi
 a.create_and_attach_volume_from_snapshot()
 
 """
+
 ask michael later:
 as far as i saw, the new "disk" name will be the device name we gave above +1.
-for example : Device='/dev/xvdw'
+example : for Device='/dev/xvdw' (in the class above)
 will need to mount xvdw1
 """
 # todo: use it from the test.py. run the thing on new machine and try to get output.
 # todo: need to see how to use elasticsearch on the the machine. probably open new port beforehand for kibana or
 # todo: connect to elasticsearch server. test connection from any machine ?
 # todo: need to see how to use the new volume in the ec2.
+
+# before running- change the device name in the class.
