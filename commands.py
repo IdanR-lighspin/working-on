@@ -116,10 +116,10 @@ except Exception as e:
 
 try:
     # todo: need to see how to get the device name properly.
-    
+
     commands = "cd /; sudo mkdir /newvolume/; sudo mount /dev/xvdt1 /newvolume1/"
     output = subprocess.getoutput(commands)
-    print ("mount-ed the new volume")
+    print("mount-ed the new volume")
 except Exception as e:
     print("failed to mount the new volume:")
     print(e)
