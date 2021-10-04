@@ -11,14 +11,22 @@ import glob
 from requests import get
 import requests
 import boto3
-from ec2_metadata import ec2_metadata
+try:
+    import ec2_metadata
+except Exception as e:
+    print("no ec2_metadata")
 import uuid
 import datetime
 from pprint import pprint
-from elasticsearch import Elasticsearch
+try:
+    from elasticsearch import Elasticsearch
+except Exception as e:
+    print("need to check problems with packages. elastic is installed on the target machine.")
 import time
-from art import *
-
+try:
+    from art import *
+except Exception as e:
+    pass # above
 
 def escape_ansi(line):
     """
@@ -33,6 +41,7 @@ def escape_ansi(line):
 
 
 def vuls(vuls_root, sudo_password):
+    print("in vuls function")
     data = {}
     vuls_scan = 'sudo docker run --rm \
         -v ~/.ssh:/root/.ssh:ro \
@@ -68,7 +77,6 @@ def vuls(vuls_root, sudo_password):
     output = subprocess.getoutput(commands1)
     # getting the data from the new json file:
     directory = "/" + vuls_root + "/results"
-    output = subprocess.getoutput("sudo " + " chmod -R 777 " + directory)  # giving access
     # we need the newest folder from the result folder:
     subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
     max = 0
@@ -89,8 +97,14 @@ def vuls(vuls_root, sudo_password):
                 max_file = temp
         except:
             max_file = temp
-    json_file = glob.glob(max_file + "/*")[0]  # there is only one file in each folder.
+    print (max_file)
+    command = sudo_password+" chmod 777 " + max_file
+    output = subprocess.getoutput(command)
 
+    json_file = glob.glob(max_file + "/*")[0]  # there is only one file in each folder.
+    command = sudo_password + " chmod 777 " + json_file
+    print(command)
+    output = subprocess.getoutput(command)
     with open(json_file, 'r') as outfile:
         json_dict = json.loads(outfile.read())  # the json string
         # loading into variable pretty big json file (about 20000 lines) and not really need all of it.
@@ -106,7 +120,8 @@ def vuls(vuls_root, sudo_password):
 
 
 def chkrotkit(sudo_password):
-    second_commnd = sudo_password + " chkrootkit"
+    print("in chkrootkit function")
+    second_commnd = sudo_password + " sudo chkrootkit -r /newvolume"
     commands = "cd /" + ";" + second_commnd
     # to_execute = ""  # the string that will run in the terminal at the end
     # for i in commands:
@@ -115,7 +130,7 @@ def chkrotkit(sudo_password):
     # cleaning the output from the terminal and prepare it fot json-ing.
     text = output_rootkit
     # strings to remove:
-    chkrotkit_strs = ["ROOTDIR is `/'", ", it may take a while", "Checking", "...", "", " `", "'"]
+    chkrotkit_strs = ["ROOTDIR is `/newvolume/'", ", it may take a while", "Checking", "...", "", " `", "'"]
     for i in chkrotkit_strs:
         text = text.replace(i, "")
     text = text.split("\n")
@@ -176,6 +191,7 @@ def chkrotkit(sudo_password):
 
 
 def lynis(directory, sudo_password):
+    print("in lynis function")
     to_execute = ""
     """
     if cloned from their github:
@@ -258,7 +274,7 @@ def send_json_to_elk(file_name, index_name, instance_id, time, account_id, sessi
 
 
 def main():
-    tprint("ELK    EC2    SCAN")
+    # tprint("ELK    EC2    SCAN")
     """
     link = input("insert your ELK URL (e.g: localhost:9200) : ")
     username = input("insert your Elk username for auth(if there is no auth, click ENTER): ")
@@ -278,6 +294,7 @@ def main():
     username = "elastic"
     password = "changeme"
     """
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--elastic_user_name', type=str, required=True)
     parser.add_argument('--elastic_password', type=str, required=True)
@@ -289,8 +306,9 @@ def main():
     username = args.elastic_user_name
     password = args.elastic_password
     type_of_scan = args.type_of_scan
-
+    
     elastic = Elasticsearch([link], http_auth=(username, password))
+    """
     print("running ...")
 
     # get IP:
@@ -302,7 +320,7 @@ def main():
 
     begin_time = datetime.datetime.now()
 
-    vuls_directory = "home/ubuntu/idannos"
+    vuls_directory = "home/ubuntu/vuls"  # vuls_directory = "home/ubuntu/vuls"
     lynis_directory = "home/ubuntu/lynis"  # don't really use it the function, explanation there.
 
     chkrotkit(sudo_password)
@@ -318,7 +336,7 @@ def main():
     public_ip = str(get('https://api.ipify.org').text)
 
     # get the instance_id:
-    instance_id = ec2_metadata.instance_id
+    # instance_id = ec2_metadata.instance_id
     # uuid:
     uuid_string = str(uuid.uuid4())
 
@@ -339,18 +357,19 @@ def main():
     except Exception as e:
         account_id = "failed to get account_id"
     # all of the uploading take about 8 seconds:
+    """
     send_json_to_elk("rootkit.json", "aws_rootkit_scan_", instance_id, date, account_id, uuid_string, "rootkit",
                      elastic)
     send_json_to_elk("cves.json", "aws_vuls_cves_scan_", instance_id, date, account_id, uuid_string, "vuls", elastic)
     send_json_to_elk("lynis.json", "aws_lynis_scan_", instance_id, date, account_id, uuid_string, "lynis", elastic)
     # how to see: in kibana -> settings -> index patterns -> create index pattern -> providing the names etc.
-
+    """
     print("Took: ", datetime.datetime.now() - begin_time, " to execute.")
     # locally about 2:30 minutes. less on ec2- about 1:30
 
 
 if __name__ == "__main__":
-    main()
+    main() # dont run this file directly
 
 """
 mini tutorial before running:
@@ -368,4 +387,8 @@ elasticsearch
 requests
 datetime
 re
+"""
+
+"""
+test permissions on the results file.
 """
