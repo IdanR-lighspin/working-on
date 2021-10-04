@@ -7,7 +7,9 @@ import boto
 import subprocess
 import time
 from creator import Creator
+import time
 
+start_time = time.time()
 # Before running this:
 # need to "aws configure" in terminal and provide data.
 
@@ -147,18 +149,19 @@ instance_id = "i-073ae94f0d3e7b4d3"
 global_ip = instance_id_ip(instance_id)
 
 a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
-
+a.create_and_attach_volume_from_snapshot()
 ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")
+ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/main_elk.py", "/home/ubuntu/test1.py")
 
 # IN THIS POINT: we have new ec2 running and all the things installed there.
 # after running this once, need to change device name (there are list of available names. ill handle it later
 # need to run just this function:
-a.create_and_attach_volume_from_snapshot()
+
 
 # IN THIS POINT: we attached the new volume to the new ec2, and mounted it the the commands file.
 
-# todo: get device name probably with psutil
-# todo: see ssh thing in vuls- so we wont download the vuls just to the new volume.
-# todo: integrate the elastic code and open elastic server with port forwarding for the scan output
-# todo: run the thing after changing device name, GroupName (in this file)
+print("took to execute: ", time.time()-start_time)  # about 6 minutes
 
+# todo: get device name probably with psutil- not sure that its possible.
+# todo: vuls isn't outputting correctly. need to look on the config file probably.
+# todo: need to run elastic from different machine and port forward the kibana port. now the kibana code is commented.
