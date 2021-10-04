@@ -369,7 +369,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main() # dont run this file directly
+    main()  # don't run this file directly
 
 """
 mini tutorial before running:
