@@ -39,7 +39,7 @@ class Creator:
         self.snapshot_id_ = snapshot_id
         print("Created snapshot: ", self.snapshot_id_)
         # need to wait for the snapshot to end the pending time:
-        time.sleep(60)  # sometimes need 3 seconds, sometimes need over 100 seconds.
+        time.sleep(100)  # sometimes need 3 seconds, sometimes need over 100 seconds.
 
     def create_and_attach_volume_from_snapshot(self):
         self.create_snapshot()
@@ -64,24 +64,26 @@ class Creator:
         )
 
         print(f'Created volume {new_volume.id} from Snapshot {self.snapshot_id_}')
-        time.sleep(20)
+        time.sleep(30)
 
         # attach:
+        try:
+            volume_id = new_volume.id
+            # volume_id = new_volume.id
+            volume = self.ec2.Volume(volume_id)
+            volume.attach_to_instance(
+                Device='/dev/xvdt',
+                InstanceId=self.instance_id_to_attach
+            )
+            print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
+        except Exception as e:
+            print("Error: ", e)
+            # probably already used this device name.
 
-        volume_id = new_volume.id
-        # volume_id = new_volume.id
-        volume = self.ec2.Volume(volume_id)
-        volume.attach_to_instance(
-            Device='/dev/xvdt',
-            InstanceId=self.instance_id_to_attach
-        )
-        print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
 
-
-
-a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
+#a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
 # need to run just this function:
-a.create_and_attach_volume_from_snapshot()
+#a.create_and_attach_volume_from_snapshot()
 
 """
 
