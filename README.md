@@ -8,4 +8,3 @@ running the main now:
 bugs:
 - can't access any tool after chroot.
 - vuls output doesnt contain cves. faced this issue before, probably config error. need to run vuls after chroot to the new volume, which isnt working.
-- need to find a way to get the the volume name. didnt find a way with psutil.
