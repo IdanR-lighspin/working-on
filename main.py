@@ -38,7 +38,7 @@ def get_vpc():
 
 def security_group_settings(vpc_id_):
     try:
-        response = ec2.create_security_group(GroupName='idantest24',
+        response = ec2.create_security_group(GroupName='idantest28', #change bedore run again
                                              Description='DESCRIPTION',
                                              VpcId=vpc_id_)
         security_group_id = response['GroupId']
@@ -114,8 +114,8 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
     """
     # IMPORTANT- without chmod 400 (etc) the ssh will not work due to too open access to the key file.
     sudo_password = "echo " + sudo_pass + " | sudo -S "
-    commands1 = sudo_password + ";" + "sudo chmod 400 /"+key_pair_name+".pem"
-    output = subprocess.getoutput(commands1)
+    commands1 = sudo_password + " ;" + " sudo chmod 400 /"+"/home/idan/PycharmProjects/pythonProject/"+key_pair_name+".pem"
+    output = subprocess.getoutput(commands1)  # ill change the path later, its pretty late
 
     username = "ubuntu"  # may get this as parameter later on
     ssh = paramiko.SSHClient()
@@ -136,21 +136,22 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
 
 
 def main():
-    key_pair_name = "idan8"  # without .pem
+    key_pair_name = "idan12"  # without .pem
     sudo_password = "Idan2408"
 
     vpc_id = get_vpc()
     print(vpc_id)
 
-    # security_group_id = security_group_settings(vpc_id)
-    # print(security_group_id)
+    #security_group_id = security_group_settings(vpc_id)
+    #print(security_group_id)
 
-    # instance_id = create_ec2(security_group_id, key_pair_name)
-    instance_id = "i-073ae94f0d3e7b4d3"
+    #instance_id = create_ec2(security_group_id, key_pair_name)
+    #print("instance id: ", instance_id)
+    instance_id = "i-06bdcb2db44865a59"
 
     global_ip = instance_id_ip(instance_id)
 
-    a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
+    a = Creator("us-east-2", instance_id,  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
     a.create_and_attach_volume_from_snapshot()
     ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")
     ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/main_elk.py", "/home/ubuntu/test1.py")
