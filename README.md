@@ -6,7 +6,7 @@ running the main now:
 - running all of the checks and save them as jsons on the created ec2.
 
 todo:
-- can't access any tool after chroot.-> give chkrootkit new rootdit. install lynis 
+- copy lynis to the new volune and run from there. 
 - vuls output doesnt contain cves. faced this issue before, probably config error. need to run vuls after chroot to the new volume, which isnt working.
 
 before running:
