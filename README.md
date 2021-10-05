@@ -5,6 +5,10 @@ running the main now:
 - the creator class attaches the wanted volume to the ec2 we created. then mount it to local folder from the command script.
 - running all of the checks and save them as jsons on the created ec2.
 
-bugs:
-- can't access any tool after chroot.
+todo:
+- can't access any tool after chroot.-> give chkrootkit new rootdit. install lynis 
 - vuls output doesnt contain cves. faced this issue before, probably config error. need to run vuls after chroot to the new volume, which isnt working.
+
+before running:
+-  /newvolumes has different numbers throughout the code.
+-  change "idan8" key name. 
