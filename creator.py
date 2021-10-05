@@ -72,7 +72,7 @@ class Creator:
             # volume_id = new_volume.id
             volume = self.ec2.Volume(volume_id)
             volume.attach_to_instance(
-                Device='/dev/xvdt',
+                Device='/dev/xvdt',  # need to change this before running, this name already used.
                 InstanceId=self.instance_id_to_attach
             )
             print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
@@ -85,13 +85,7 @@ class Creator:
 # need to run just this function:
 #a.create_and_attach_volume_from_snapshot()
 
-"""
 
-ask michael later:
-as far as i saw, the new "disk" name will be the device name we gave above +1.
-example : for Device='/dev/xvdw' (in the class above)
-will need to mount xvdw1
-"""
 # todo: use it from the test.py. run the thing on new machine and try to get output.
 # todo: need to see how to use elasticsearch on the the machine. probably open new port beforehand for kibana or
 # todo: connect to elasticsearch server. test connection from any machine ?
