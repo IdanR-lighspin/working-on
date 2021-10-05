@@ -120,7 +120,7 @@ except Exception as e:
 try:
     output = subprocess.getoutput("lsblk --json -fs")
     lsblk = json.loads(output)
-    mount_dev = "/dev/xvdt1"  # prevent the maybe undefined.
+    mount_dev = "/dev/xvdu1"  # prevent the maybe undefined.
     for item in lsblk["blockdevices"]:
         if item["fstype"] in ["ext2", "xfs", "ext3", "ext4"] and not (item['mountpoint']):
             mount_dev = f"/dev/{item['name']}"
