@@ -97,13 +97,11 @@ def vuls(vuls_root, sudo_password):
                 max_file = temp
         except:
             max_file = temp
-    print (max_file)
     command = sudo_password+" chmod 777 " + max_file
     output = subprocess.getoutput(command)
 
     json_file = glob.glob(max_file + "/*")[0]  # there is only one file in each folder.
     command = sudo_password + " chmod 777 " + json_file
-    print(command)
     output = subprocess.getoutput(command)
     with open(json_file, 'r') as outfile:
         json_dict = json.loads(outfile.read())  # the json string
@@ -364,7 +362,7 @@ def main():
     send_json_to_elk("lynis.json", "aws_lynis_scan_", instance_id, date, account_id, uuid_string, "lynis", elastic)
     # how to see: in kibana -> settings -> index patterns -> create index pattern -> providing the names etc.
     """
-    print("Took: ", datetime.datetime.now() - begin_time, " to execute.")
+    print("Elk file execution time took: ", datetime.datetime.now() - begin_time, " S to execute.")
     # locally about 2:30 minutes. less on ec2- about 1:30
 
 
@@ -389,6 +387,3 @@ datetime
 re
 """
 
-"""
-test permissions on the results file.
-"""
