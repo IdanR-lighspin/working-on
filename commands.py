@@ -1,5 +1,8 @@
 import subprocess
 import time
+import json
+import os
+
 start_time = time.time()
 command9 = "cd /home/ubuntu/vuls"
 try:
@@ -115,10 +118,17 @@ except Exception as e:
     print(e)
 
 try:
-    # todo: need to see how to get the device name properly.
+    output = subprocess.getoutput("lsblk --json -fs")
+    lsblk = json.loads(output)
+    mount_dev = "/dev/xvdt1"  # prevent the maybe undefined.
+    for item in lsblk["blockdevices"]:
+        if item["fstype"] in ["ext2", "xfs", "ext3", "ext4"] and not (item['mountpoint']):
+            mount_dev = f"/dev/{item['name']}"
 
-    commands = "cd /; sudo mkdir /newvolume/; sudo mount /dev/xvdt1 /newvolume1/"
+    disk_name = str(mount_dev)
+    commands = "cd /; sudo mkdir /newvolume1/; sudo mount "+disk_name+" /newvolume1/"
     output = subprocess.getoutput(commands)
+    print("mount-ed the new volume")
     print("mount-ed the new volume")
 except Exception as e:
     print("failed to mount the new volume:")
@@ -127,4 +137,8 @@ except Exception as e:
     # means we try to mount a file that didn't even created.
 
 
-print("took to execute: ", time.time()-start_time)  # about 6 minutes
+print("commands took to execute: ", time.time()-start_time)  # about 6 minutes
+
+
+# AFTER CHROOT:
+
