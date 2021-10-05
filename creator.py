@@ -72,7 +72,7 @@ class Creator:
             # volume_id = new_volume.id
             volume = self.ec2.Volume(volume_id)
             volume.attach_to_instance(
-                Device='/dev/xvdt',  # need to change this before running, this name already used.
+                Device='/dev/xvdu',  # need to change this before running, this name already used.
                 InstanceId=self.instance_id_to_attach
             )
             print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
