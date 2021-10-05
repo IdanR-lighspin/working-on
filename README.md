@@ -6,5 +6,6 @@ running the main now:
 - running all of the checks and save them as jsons on the created ec2.
 
 bugs:
+- can't access any tool after chroot.
 - vuls output doesnt contain cves. faced this issue before, probably config error. need to run vuls after chroot to the new volume, which isnt working.
 - need to find a way to get the the volume name. didnt find a way with psutil.
