@@ -1,4 +1,5 @@
 import subprocess
+# add pip installations via subprocess. need to obtain sudo pass for installing pip first.
 import json
 import datetime
 import argparse
@@ -10,7 +11,7 @@ import sys
 import glob
 from requests import get
 import requests
-import boto3
+import boto3  # need to pip this before running
 try:
     import ec2_metadata
 except Exception as e:
@@ -21,7 +22,7 @@ from pprint import pprint
 try:
     from elasticsearch import Elasticsearch
 except Exception as e:
-    print("need to check problems with packages. elastic is installed on the target machine.")
+    print("need to check problems with packages. elastic is installed on the target machine.") # now its not, new one
 import time
 try:
     from art import *
