@@ -78,6 +78,8 @@ def vuls(vuls_root, sudo_password):
     output = subprocess.getoutput(commands1)
     # getting the data from the new json file:
     directory = "/" + vuls_root + "/results"
+    command = sudo_password + " chmod 777 " + directory
+    output = subprocess.getoutput(command)
     # we need the newest folder from the result folder:
     subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
     max = 0
@@ -197,7 +199,7 @@ def lynis(directory, sudo_password):
     run it from the lynis dir: 
     sudo ./lynis audit system
 
-    The git version gives a bit more output, I have a comparison in my mail.
+    The git version gives a bit more output, I have a comparison in my email.
     """
     commands = "cd /" + sudo_password + " lynis audit system"
     # for i in commands:
@@ -345,6 +347,7 @@ def main():
     date = temp[0]  # getting the date only without hours
 
     # need to fill this before running:
+    # probably there is a way to get this data without filling.
     try:
         # ACCESS_KEY = ''
         # SECRET_KEY = ''
