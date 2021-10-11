@@ -13,3 +13,4 @@ before running:
 -  /newvolumes has different numbers throughout the code.
 -  change "idan8" key name. 
 -  import boto3 (eventually the code will do it with a subprocess)
+-  - change device name in class
