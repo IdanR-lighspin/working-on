@@ -19,7 +19,6 @@ try:
     commands = "cd /; sudo mkdir /"+new_vol_name+"/; sudo mount "+disk_name+" /"+new_vol_name+"/"
     output = subprocess.getoutput(commands)
     print("mount-ed the new volume")
-    print("mount-ed the new volume")
 except Exception as e:
     print("failed to mount the new volume:")
     print(e)
@@ -102,9 +101,9 @@ try:
 except Exception as e:
     print("problem with creating vuls dirs:")
     print(e)
-"""
+
 try:
-    
+    """
     command9 = "cd /home/ubuntu/vuls"
     command11 = "sudo docker run --rm -it \
         -v $PWD:/go-cve-dictionary \
@@ -128,10 +127,11 @@ try:
         vuls/go-msfdb fetch msfdb"
     output = subprocess.getoutput(command9+"; "+command11+"; "+command12+"; "+command13+"; "+command14+"; "+command15)
     print("fetched DBs")
+    """
 except Exception as e:
     print("error fetching DBs")
     print(e)
-"""
+
 try:
 
     command16 = "sudo echo | ssh-keygen -P ''"
@@ -156,10 +156,4 @@ except Exception as e:
     print(e)
 
 
-
-
 print("commands took to execute: ", time.time()-start_time)  # about 6 minutes
-
-
-# AFTER CHROOT:
-
