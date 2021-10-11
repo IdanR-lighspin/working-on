@@ -81,14 +81,8 @@ class Creator:
             # probably already used this device name.
 
 
-#a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3',  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
+# a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3', "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
 # need to run just this function:
-#a.create_and_attach_volume_from_snapshot()
+# a.create_and_attach_volume_from_snapshot()
 
-
-# todo: use it from the test.py. run the thing on new machine and try to get output.
-# todo: need to see how to use elasticsearch on the the machine. probably open new port beforehand for kibana or
-# todo: connect to elasticsearch server. test connection from any machine ?
-# todo: need to see how to use the new volume in the ec2.
-
-# before running- change the device name in the class.
+# before running- change the device name in the class !!!
