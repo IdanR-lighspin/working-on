@@ -164,4 +164,5 @@ if __name__ == "__main__":
 
 
 # todo: vuls isn't outputting correctly. need to look on the config file probably.
-# todo: need to run elastic from different machine and port forward the kibana port. now the kibana code is commented.
+# todo: run vuls and lynis on the new root.
+# todo: the kibana code is commented for now.
