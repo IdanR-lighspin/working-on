@@ -1,4 +1,8 @@
 import subprocess
+
+output = subprocess.getoutput("sudo apt install python3-pip -y")
+print(output)
+
 # add pip installations via subprocess. need to obtain sudo pass for installing pip first.
 import json
 import datetime
@@ -11,23 +15,40 @@ import sys
 import glob
 from requests import get
 import requests
-import boto3  # need to pip this before running
 try:
-    import ec2_metadata
+    output = subprocess.getoutput("pip3 install ec2_metadata")
+    import boto3  # need to pip this before running
+    print(output)
 except Exception as e:
+    import boto3
+    print(e)
+try:
+    output = subprocess.getoutput("pip3 install ec2_metadata")
+    import ec2_metadata
+
+    print(output)
+except Exception as e:
+    import ec2_metadata
     print("no ec2_metadata")
 import uuid
 import datetime
 from pprint import pprint
 try:
+    output = subprocess.getoutput("pip3 install elasticsearch")
     from elasticsearch import Elasticsearch
+
+    print(output)
 except Exception as e:
+    from elasticsearch import Elasticsearch
     print("need to check problems with packages. elastic is installed on the target machine.") # now its not, new one
 import time
 try:
+    output = subprocess.getoutput("pip3 install art") # the thing here can crash so im importing in the except.
     from art import *
+    print(output)
 except Exception as e:
-    pass # above
+    from art import *
+    print(e)
 
 def escape_ansi(line):
     """
@@ -201,6 +222,13 @@ def lynis(directory, sudo_password):
 
     The git version gives a bit more output, I have a comparison in my email.
     """
+    # run on the new root:
+    #command = """sudo chroot /newvolume1 /bin/bash <<"EOT"
+#sudo lynis audit system
+#echo $$
+#EOT"""
+    #output = subprocess.getoutput(command)  # saving terminal's output
+
     commands = "cd /" + sudo_password + " lynis audit system"
     # for i in commands:
     # to_execute += i + ';'
