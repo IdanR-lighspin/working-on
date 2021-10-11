@@ -12,5 +12,5 @@ todo:
 before running:
 -  /newvolumes has different numbers throughout the code.
 -  change "idan8" key name. 
--  import boto3 (eventually the code will do it with a subprocess)
+-  import boto3 (eventually the code will do it with a subprocess)- done the code importing but need to see what to do with the sudo password. maybe just run the python with sudo.
 -  change device name in class
