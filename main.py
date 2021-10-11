@@ -130,7 +130,7 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
     sftp.close()
 
     # running the file:
-    stdin_, stdout_, stderr_ = ssh.exec_command("python3 " + destination_file_path, get_pty=True)
+    stdin_, stdout_, stderr_ = ssh.exec_command("python3 " + destination_file_path, get_pty=True) # probably add sudo here
     time.sleep(5)  # don't know why, but prevents crashing :) (well, apparently just sometimes. need to check more.)
     stdout_.channel.recv_exit_status()
     lines = stdout_.readlines()
