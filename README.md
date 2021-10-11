@@ -4,9 +4,8 @@ running the main now:
 - install all the things there.
 - the creator class attaches the wanted volume to the ec2 we created. then mount it to local folder from the command script.
 - running all of the checks and save them as jsons on the created ec2.
-
+- (now the lynis is being installed to the ec2 regular dir and to the new volume. didnt test it yet. ill fix it after a bit testing.
 todo:
-- copy lynis to the new volume and run from there. had problems with the new file system files, but I think I know what to do.
 - vuls output doesnt contain cves. faced this issue before, probably config error. need to run vuls after chroot to the new volume, which isnt working (due to the same error as above)+ add ssh thing etc.
 
 before running:
