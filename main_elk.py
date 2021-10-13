@@ -223,11 +223,11 @@ def lynis(directory, sudo_password):
     The git version gives a bit more output, I have a comparison in my email.
     """
     # run on the new root:
-    #command = """sudo chroot /newvolume1 /bin/bash <<"EOT"
-#sudo lynis audit system
-#echo $$
-#EOT"""
-    #output = subprocess.getoutput(command)  # saving terminal's output
+    command = """sudo chroot /newvolume1 /bin/bash <<"EOT"
+sudo lynis audit system
+echo $$
+EOT"""
+    output = subprocess.getoutput(command)  # saving terminal's output
 
     commands = "cd /" + sudo_password + " lynis audit system"
     # for i in commands:
@@ -235,8 +235,11 @@ def lynis(directory, sudo_password):
 
     output_lynis = subprocess.getoutput(commands)  # saving terminal's output
     title = ""
-    text = output_lynis
-
+    #text = output_lynis
+    """
+    changed here !!!
+    """
+    text = output
     escaped_line = escape_ansi(text)  # cleaning output from ANSI stuff.
 
     text = escaped_line
