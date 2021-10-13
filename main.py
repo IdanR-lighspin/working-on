@@ -167,5 +167,8 @@ if __name__ == "__main__":
 
 
 # todo: vuls isn't outputting correctly. need to look on the config file probably.
-# todo: run vuls on the new root.
+# todo: run vuls on the new root.-> ssh to it etc.
 # todo: the kibana code is commented for now- need to check on "remote" kibana server.
+# lynis is now go over the new volume. the comparison between the jsons is in my email.
+# (one is on the new volume and one is on all of the ec2 machine.
+
