@@ -70,7 +70,7 @@ echo $$
 EOT""".format(fname=new_vol_name)
     output = subprocess.getoutput(command21)
 except Exception as e:
-    print("problem with installimg lynis to the new root")
+    print("problem with installing lynis to the new root")
 # vuls :(
 
 # keep in mind the ssh keygen thing.
@@ -148,12 +148,15 @@ try:
 [servers.localhost]
 host = "localhost"
 port = "local"
+
+
 EOF
 """
     output = subprocess.getoutput(command9+"; "+command17)
     print("created config file")
 except Exception as e:
     print(e)
+
 
 
 print("commands took to execute: ", time.time()-start_time)  # about 6 minutes
