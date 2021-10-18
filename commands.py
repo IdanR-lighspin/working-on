@@ -103,7 +103,8 @@ except Exception as e:
     print(e)
 
 try:
-    """
+    # this is taking a lot of time:
+    # comment it after the first run for testings.
     command9 = "cd /home/ubuntu/vuls"
     command11 = "sudo docker run --rm -it \
         -v $PWD:/go-cve-dictionary \
@@ -127,7 +128,6 @@ try:
         vuls/go-msfdb fetch msfdb"
     output = subprocess.getoutput(command9+"; "+command11+"; "+command12+"; "+command13+"; "+command14+"; "+command15)
     print("fetched DBs")
-    """
 except Exception as e:
     print("error fetching DBs")
     print(e)
@@ -156,7 +156,6 @@ EOF
     print("created config file")
 except Exception as e:
     print(e)
-
 
 
 print("commands took to execute: ", time.time()-start_time)  # about 6 minutes
