@@ -154,7 +154,7 @@ def main():
     instance_id = "i-0a70851a2af9eec29"
 
     global_ip = instance_id_ip(instance_id)
-    print(global_ip)  # global ip of the new machine
+    print("instace global ip:", global_ip)  # global ip of the new machine
     time.sleep(20)
     a = Creator("us-east-2", instance_id,  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
     a.create_and_attach_volume_from_snapshot()
@@ -176,14 +176,14 @@ if __name__ == "__main__":
 """
 If getting this error:
 "paramiko.ssh_exception.SSHException: Channel closed."  -
-try to reboot the new instance (it's IP and ID printed here)
+try to reboot the new ec2 instance (it's IP and ID printed here)
 """
 
 """
-rarely getting this error:
+rarely getting this error, but if:
 Error: An error occurred (InvalidVolume.ZoneMismatch) when calling the AttachVolume operation: The volume 
 'vol-*****************' is not in the same availability zone as instance 'i-****************'
 solve: change AZ in creator file to one of: "us-east-a" or "us-east-b" or "us-east-c".
+if still get this error, add large amount of sleep before the volume attaching things.
 """
 
-# in this run: check snapshot and volume name
