@@ -1,54 +1,52 @@
 import subprocess
 
-output = subprocess.getoutput("sudo apt install python3-pip -y")
-print(output)
+try:
+    output = subprocess.getoutput("sudo apt install python3-pip -y")
+except Exception as e:
+    print("pip error")
+    print(e)
+# add pip installations via subprocess. probably need to obtain sudo pass for installing pip first.
 
-# add pip installations via subprocess. need to obtain sudo pass for installing pip first.
 import json
+import uuid
 import datetime
-import argparse
 import socket
 import os
-import urllib.request
 import re
-import sys
 import glob
 from requests import get
-import requests
+
 try:
-    output = subprocess.getoutput("pip3 install ec2_metadata")
-    import boto3  # need to pip this before running
-    print(output)
+    output = subprocess.getoutput("pip3 install boto3")
+    import boto3
+    #print(output)
 except Exception as e:
     import boto3
     print(e)
+
 try:
     output = subprocess.getoutput("pip3 install ec2_metadata")
     import ec2_metadata
-
-    print(output)
+    #print(output)
 except Exception as e:
     import ec2_metadata
     print("no ec2_metadata")
-import uuid
-import datetime
-from pprint import pprint
+
 try:
     output = subprocess.getoutput("pip3 install elasticsearch")
     from elasticsearch import Elasticsearch
-
-    print(output)
+    #print(output)
 except Exception as e:
     from elasticsearch import Elasticsearch
-    print("need to check problems with packages. elastic is installed on the target machine.") # now its not, new one
-import time
+    print("elasticsearch package error")
 try:
-    output = subprocess.getoutput("pip3 install art") # the thing here can crash so im importing in the except.
+    output = subprocess.getoutput("pip3 install art")  # the thing here can crash so im importing in the except(for all)
     from art import *
-    print(output)
+    #print(output)
 except Exception as e:
     from art import *
     print(e)
+
 
 def escape_ansi(line):
     """
@@ -99,7 +97,7 @@ def vuls(vuls_root, sudo_password):
     output = subprocess.getoutput(commands1)
     # getting the data from the new json file:
     directory = "/" + vuls_root + "/results"
-    command = sudo_password + " chmod 777 " + directory
+    command = sudo_password + " chmod 777 " + directory  # change before finish
     output = subprocess.getoutput(command)
     # we need the newest folder from the result folder:
     subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
@@ -143,7 +141,7 @@ def vuls(vuls_root, sudo_password):
 
 def chkrotkit(sudo_password):
     print("in chkrootkit function")
-    second_commnd = sudo_password + " sudo chkrootkit -r /newvolume"
+    second_commnd = sudo_password + " sudo chkrootkit -r /newvolume1"
     commands = "cd /" + ";" + second_commnd
     # to_execute = ""  # the string that will run in the terminal at the end
     # for i in commands:
@@ -227,6 +225,8 @@ def lynis(directory, sudo_password):
 sudo lynis audit system
 echo $$
 EOT"""
+    # need to see how to eventually call the /newvolume1 above. maybe adding 1 or a random string is safer
+    # for preventing overwrite (?)
     output = subprocess.getoutput(command)  # saving terminal's output
 
     commands = "cd /" + sudo_password + " lynis audit system"
@@ -235,7 +235,7 @@ EOT"""
 
     output_lynis = subprocess.getoutput(commands)  # saving terminal's output
     title = ""
-    #text = output_lynis
+    # text = output_lynis
     """
     changed here !!!
     """
