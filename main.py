@@ -36,9 +36,9 @@ def get_vpc():
     return vpc_id
 
 
-def security_group_settings(vpc_id_):
+def security_group_settings(vpc_id_, group_name):
     try:
-        response = ec2.create_security_group(GroupName='idantest30', #change bedore run again
+        response = ec2.create_security_group(GroupName=group_name, #change bedore run again
                                              Description='DESCRIPTION',
                                              VpcId=vpc_id_)
         security_group_id = response['GroupId']
@@ -92,7 +92,7 @@ def create_ec2(security_group_id, key_pair_name):
 def instance_id_ip(instance_id):
     ec2_global_ip = ""
     # instance_id = "i-073ae94f0d3e7b4d3"
-    temp = boto.ec2.connect_to_region(region)
+    temp = boto.ec2.connect_to_region(region)  # check here for the new error
     reservations = temp.get_all_instances()
     for r in reservations:
         for i in r.instances:
@@ -100,7 +100,7 @@ def instance_id_ip(instance_id):
                 if i.id == instance_id:
                     ec2_global_ip = i.ip_address
                     vpc_id = i.vpc_id
-                    #print("On: " + ec2_global_ip)
+                    # print("On: " + ec2_global_ip)
     return ec2_global_ip
 
 
@@ -130,7 +130,8 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
     sftp.close()
 
     # running the file:
-    stdin_, stdout_, stderr_ = ssh.exec_command("python3 " + destination_file_path, get_pty=True) # probably add sudo here
+    stdin_, stdout_, stderr_ = ssh.exec_command("sudo python3 " + destination_file_path, get_pty=True)
+    # this will be the sudo of the new machine- I guess it won't have a password?
     time.sleep(5)  # don't know why, but prevents crashing :) (well, apparently just sometimes. need to check more.)
     stdout_.channel.recv_exit_status()
     lines = stdout_.readlines()
@@ -139,21 +140,22 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
 
 
 def main():
-    key_pair_name = "idan14"  # without .pem
+    key_pair_name = "idan15"  # without .pem
     sudo_password = "Idan2408"
 
     vpc_id = get_vpc()
     print(vpc_id)
 
-    #security_group_id = security_group_settings(vpc_id)
+    #security_group_id = security_group_settings(vpc_id, "idantest31")
     #print(security_group_id)
 
     #instance_id = create_ec2(security_group_id, key_pair_name)
     #print("instance id: ", instance_id)
-    instance_id = "i-0e08f61499fd5b91e"
+    instance_id = "i-0a70851a2af9eec29"
 
     global_ip = instance_id_ip(instance_id)
-
+    print(global_ip)  # global ip of the new machine
+    time.sleep(20)
     a = Creator("us-east-2", instance_id,  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
     a.create_and_attach_volume_from_snapshot()
     ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")
@@ -166,9 +168,22 @@ if __name__ == "__main__":
     main()
 
 
-# todo: vuls isn't outputting correctly. need to look on the config file probably.
-# todo: run vuls on the new root.-> ssh to it etc.
-# todo: the kibana code is commented for now- need to check on "remote" kibana server.
-# lynis is now go over the new volume. the comparison between the jsons is in my email.
-# (one is on the new volume and one is on all of the ec2 machine.
+# todo: set ssh to the new volume.(follow the remote vuls tutorial)
+# todo: (use the ssh used to connect to the new ec2 probably) ->
+# todo: try to connect to it from the new ec2. ->
+# todo: the kibana code is commented for now- need to check on remote kibana server.
 
+"""
+If getting this error:
+"paramiko.ssh_exception.SSHException: Channel closed."  -
+try to reboot the new instance (it's IP and ID printed here)
+"""
+
+"""
+rarely getting this error:
+Error: An error occurred (InvalidVolume.ZoneMismatch) when calling the AttachVolume operation: The volume 
+'vol-*****************' is not in the same availability zone as instance 'i-****************'
+solve: change AZ in creator file to one of: "us-east-a" or "us-east-b" or "us-east-c".
+"""
+
+# in this run: check snapshot and volume name
