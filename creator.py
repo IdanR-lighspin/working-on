@@ -27,11 +27,19 @@ class Creator:
         self.volume_id_ = volume_id
         print("Got volume: ", self.volume_id_)
 
+
     def create_snapshot(self):
         self.get_volume_id_of_instance()
         response = self.ec2.create_snapshot(
-            VolumeId=self.volume_id_
-        )
+                Description='volume snapshot',
+                VolumeId=self.volume_id_,
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'snapshot',
+                        'Tags': [{'Key': 'Name', 'Value': 'Red-detector-snapshot'}],
+                    },
+                ],
+            )
         # taking snapshot:
         response = str(response)
         response = response.replace("ec2.Snapshot(id='", "")  # ec2.Snapshot(id='snap-0bfb40a0d37dfaf7e')
@@ -39,7 +47,7 @@ class Creator:
         self.snapshot_id_ = snapshot_id
         print("Created snapshot: ", self.snapshot_id_)
         # need to wait for the snapshot to end the pending time:
-        time.sleep(100)  # sometimes need 3 seconds, sometimes need over 100 seconds.
+        time.sleep(150)  # sometimes need 3 seconds, sometimes need over 100 seconds.
 
     def create_and_attach_volume_from_snapshot(self):
         self.create_snapshot()
@@ -47,7 +55,7 @@ class Creator:
         # create:
 
         new_volume = self.ec2.create_volume(
-            AvailabilityZone='us-east-2b',
+            AvailabilityZone='us-east-2a',  # check here- problems with AZ. changed us-east-2b to us-east-2a fixed it.
             SnapshotId=self.snapshot_id_,
             VolumeType='gp2',
             TagSpecifications=[
@@ -56,7 +64,7 @@ class Creator:
                     'Tags': [
                         {
                             'Key': 'Name',
-                            'Value': 'test'
+                            'Value': 'red detector-volume'
                         }
                     ]
                 }
@@ -72,13 +80,13 @@ class Creator:
             # volume_id = new_volume.id
             volume = self.ec2.Volume(volume_id)
             volume.attach_to_instance(
-                Device='/dev/xvds',  # need to change this before running, this name already used.
+                Device='/dev/xvdr',  # need to change this before running, this name already used.
                 InstanceId=self.instance_id_to_attach
             )
             print(f'Volume {volume.id} attached to -> {self.instance_id_to_attach}')
         except Exception as e:
             print("Error: ", e)
-            # probably already used this device name.
+            # probably already used this device name. i guess when running on a new machine this wont be a problem
 
 
 # a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3', "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
