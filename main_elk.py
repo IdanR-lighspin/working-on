@@ -383,7 +383,7 @@ if __name__ == "__main__":
     main()  # don't run this file directly
 
 """
-mini tutorial before running:
+mini tutorial before running :
 - install Vuls with docker from: https://vuls.io/docs/en/tutorial-docker.html
 - install chkrootkit: apt-get install chkrootkit
 - install lynis: apt-get install lynis
