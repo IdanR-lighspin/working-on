@@ -1,11 +1,11 @@
 import subprocess
 
+# add pip installations via subprocess. probably need to obtain sudo pass for installing pip first:
 try:
     output = subprocess.getoutput("sudo apt install python3-pip -y")
 except Exception as e:
-    print("pip error")
+    print("pip error. need to install manually.")
     print(e)
-# add pip installations via subprocess. probably need to obtain sudo pass for installing pip first.
 
 import json
 import uuid
@@ -19,7 +19,6 @@ from requests import get
 try:
     output = subprocess.getoutput("pip3 install boto3")
     import boto3
-    #print(output)
 except Exception as e:
     import boto3
     print(e)
@@ -35,14 +34,12 @@ except Exception as e:
 try:
     output = subprocess.getoutput("pip3 install elasticsearch")
     from elasticsearch import Elasticsearch
-    #print(output)
 except Exception as e:
     from elasticsearch import Elasticsearch
     print("elasticsearch package error")
 try:
-    output = subprocess.getoutput("pip3 install art")  # the thing here can crash so im importing in the except(for all)
-    from art import *
-    #print(output)
+    output = subprocess.getoutput("pip3 install art")
+    from art import *  # the try here can crash so im importing in the except (for all)
 except Exception as e:
     from art import *
     print(e)
@@ -80,20 +77,10 @@ def vuls(vuls_root, sudo_password):
         vuls/vuls report \
         -format-json \
         -config=./config.toml # path to report.toml in docker'
-    # sudo_password += sudo_password+ " command"
-
-    # commands = ["cd /", "cd " + vuls_root, sudo_password + vuls_scan]
     commands = "cd /" + "; " + "cd " + vuls_root + "; " + sudo_password + vuls_scan
-    # to_execute = ""  # the string that will run in the terminal at the end
-    # for i in commands:
-    # to_execute += i + ';'  # merging the commands into one line
     output1 = subprocess.getoutput(commands)  # running the commands in the terminal and get the output.
-    # running the scan and then the report- in order to get just the report output.
-    # commands1 = ["cd /", "cd " + vuls_root, sudo_password + vuls_report]
+
     commands1 = "cd /" + ";" + "cd " + vuls_root + ";" + sudo_password + vuls_report
-    # to_execute = ""
-    # for i in commands:
-    # to_execute += i + ';'
     output = subprocess.getoutput(commands1)
     # getting the data from the new json file:
     directory = "/" + vuls_root + "/results"
@@ -141,16 +128,13 @@ def vuls(vuls_root, sudo_password):
 
 def chkrotkit(sudo_password):
     print("in chkrootkit function")
-    second_commnd = sudo_password + " sudo chkrootkit -r /newvolume1"
-    commands = "cd /" + ";" + second_commnd
-    # to_execute = ""  # the string that will run in the terminal at the end
-    # for i in commands:
-    # to_execute += i + ';'
+    second_command = sudo_password + " sudo chkrootkit -r /newvolume1"
+    commands = "cd /" + ";" + second_command
     output_rootkit = subprocess.getoutput(commands)  # getting the output from the terminal
     # cleaning the output from the terminal and prepare it fot json-ing.
     text = output_rootkit
     # strings to remove:
-    chkrotkit_strs = ["ROOTDIR is `/newvolume/'", ", it may take a while", "Checking", "...", "", " `", "'"]
+    chkrotkit_strs = ["ROOTDIR is `/newvolume1/'", ", it may take a while", "Checking", "...", "", " `", "'"]
     for i in chkrotkit_strs:
         text = text.replace(i, "")
     text = text.split("\n")
@@ -176,7 +160,7 @@ def chkrotkit(sudo_password):
                 if anomaly in j or anomaly1 in j:
                     # pass ?
                     if anomaly in j:
-                        # maybe calling a file or user this name will break the program.
+                        # maybe calling a file or a user with this name will break the thing here.
                         j = j.split(anomaly)
                         data[anomaly] = j
                     else:
@@ -185,7 +169,6 @@ def chkrotkit(sudo_password):
                                 temp = temp + text[index + mini_index] + ", "
                                 text[index + mini_index] = ""
                                 mini_index += 1
-                                # print "here"
 
                             else:
                                 break
@@ -230,15 +213,10 @@ EOT"""
     output = subprocess.getoutput(command)  # saving terminal's output
 
     commands = "cd /" + sudo_password + " lynis audit system"
-    # for i in commands:
-    # to_execute += i + ';'
 
     output_lynis = subprocess.getoutput(commands)  # saving terminal's output
-    title = ""
     # text = output_lynis
-    """
-    changed here !!!
-    """
+
     text = output
     escaped_line = escape_ansi(text)  # cleaning output from ANSI stuff.
 
@@ -421,4 +399,3 @@ requests
 datetime
 re
 """
-
