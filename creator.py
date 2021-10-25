@@ -27,7 +27,6 @@ class Creator:
         self.volume_id_ = volume_id
         print("Got volume: ", self.volume_id_)
 
-
     def create_snapshot(self):
         self.get_volume_id_of_instance()
         response = self.ec2.create_snapshot(
@@ -89,8 +88,4 @@ class Creator:
             # probably already used this device name. i guess when running on a new machine this wont be a problem
 
 
-# a = Creator("us-east-2", 'i-073ae94f0d3e7b4d3', "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
-# need to run just this function:
-# a.create_and_attach_volume_from_snapshot()
-
-# before running- change the device name in the class !!!
+# before running again- may change the device name in the class.
