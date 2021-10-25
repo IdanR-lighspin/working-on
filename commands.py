@@ -4,16 +4,16 @@ import json
 import os
 
 start_time = time.time()
-command9 = "cd /home/ubuntu/vuls"
+command9 = "cd /home/ubuntu/vuls"  # vuls folder
 new_vol_name = "newvolume1"
 try:
+    # get the new volume name:
     output = subprocess.getoutput("lsblk --json -fs")
     lsblk = json.loads(output)
-    mount_dev = "/dev/xvdu1"  # prevent the maybe undefined.
+    mount_dev = "/dev/xvdr1"  # prevent the maybe undefined.
     for item in lsblk["blockdevices"]:
         if item["fstype"] in ["ext2", "xfs", "ext3", "ext4"] and not (item['mountpoint']):
             mount_dev = f"/dev/{item['name']}"
-
 
     disk_name = str(mount_dev)
     commands = "cd /; sudo mkdir /"+new_vol_name+"/; sudo mount "+disk_name+" /"+new_vol_name+"/"
@@ -71,9 +71,9 @@ EOT""".format(fname=new_vol_name)
     output = subprocess.getoutput(command21)
 except Exception as e:
     print("problem with installing lynis to the new root")
-# vuls :(
+# vuls
 
-# keep in mind the ssh keygen thing.
+# todo: develop the ssh into chrooted environment- will fix the issue with vuls. now vuls in scanning all of the ec2.
 try:
     command5 = "sudo apt install docker.io -y"
     command6 = "sudo apt install docker -y"
@@ -103,8 +103,8 @@ except Exception as e:
     print(e)
 
 try:
-    # this is taking a lot of time:
-    # comment it after the first run for testings.
+    # that's taking a bit more than 5 minutes:
+    
     command9 = "cd /home/ubuntu/vuls"
     command11 = "sudo docker run --rm -it \
         -v $PWD:/go-cve-dictionary \
@@ -128,27 +128,26 @@ try:
         vuls/go-msfdb fetch msfdb"
     output = subprocess.getoutput(command9+"; "+command11+"; "+command12+"; "+command13+"; "+command14+"; "+command15)
     print("fetched DBs")
+    
 except Exception as e:
     print("error fetching DBs")
     print(e)
 
 try:
-
     command16 = "sudo echo | ssh-keygen -P ''"
-    output = subprocess.getoutput(command9 + "; " + command16)  # sudo su?
+    output = subprocess.getoutput(command9 + "; " + command16)  
     print("generated ssh key")
 except Exception as e:
     print("problem with creating ssh key:")
     print(e)
 
 try:
-    # todo: need to work on the ssh thing.
+    # need to run it remotely on the chrooted environment. so the config file should be different.
     command17 = """cat > config.toml <<EOF
 [servers]
 [servers.localhost]
 host = "localhost"
 port = "local"
-
 
 EOF
 """
