@@ -25,23 +25,21 @@ def get_vpc():
     vpc_id = ""
     str_i = ""
     client = boto3.client('ec2')
-    Myec2 = client.describe_instances()
-    for i in Myec2['Reservations']:
+    data = client.describe_instances()
+    for i in data['Reservations']:
         str_i = str(i)
         if "vpc" in str_i:
             str_i = str_i.split("'VpcId': '")
             str_i = str_i[1]
-            str_i = str_i.split("', 'Architecture':") # the thing that comes after the VpcId
+            str_i = str_i.split("', 'Architecture':")  # the thing that comes after the VpcId
             vpc_id = str_i[0]
     return vpc_id
 
 
 def security_group_settings(vpc_id_, group_name):
     try:
-        response = ec2.create_security_group(GroupName=group_name, #change bedore run again
-                                             Description='DESCRIPTION',
-                                             VpcId=vpc_id_)
-        security_group_id = response['GroupId']
+        response1 = ec2.create_security_group(GroupName=group_name, Description='DESCRIPTION', VpcId=vpc_id_)
+        security_group_id = response1['GroupId']
         print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id_))
 
         data = ec2.authorize_security_group_ingress(
@@ -60,19 +58,25 @@ def security_group_settings(vpc_id_, group_name):
 
 
 def create_ec2(security_group_id, key_pair_name):
+    """
+    
+    :param security_group_id: getting this from a function above
+    :param key_pair_name: key pair is created here with a hardcoded name.
+    :return: new ec2's id.
+    """
     # maybe get ImageId too.
 
-    ec2 = boto3.resource('ec2')
+    ec21 = boto3.resource('ec2')
     # create a file to store the key locally
     outfile = open(key_pair_name+'.pem', 'w')
-    key_pair = ec2.create_key_pair(KeyName=key_pair_name)
+    key_pair = ec21.create_key_pair(KeyName=key_pair_name)
 
     # capture the key and store it in a file
     KeyPairOut = str(key_pair.key_material)
     outfile.write(KeyPairOut)
 
     # create a new EC2 instance
-    instances = ec2.create_instances(
+    instances = ec21.create_instances(
          ImageId='ami-00399ec92321828f5',
          MinCount=1,
          MaxCount=1,
@@ -82,7 +86,7 @@ def create_ec2(security_group_id, key_pair_name):
              security_group_id,
          ]
      )
-    instance_id_ = str(instances[0])  # output: [ec2.Instance(id='i-0e379dc5b2efc913c')]
+    instance_id_ = str(instances[0])  # raw output: [ec2.Instance(id='i-0e379dc5b2efc913c')]
     instance_id_ = instance_id_.replace("ec2.Instance(id='", "")
     instance_id_ = instance_id_.replace("')", "")
     print(instance_id_)
@@ -90,6 +94,11 @@ def create_ec2(security_group_id, key_pair_name):
 
 
 def instance_id_ip(instance_id):
+    """
+    
+    :param instance_id: instance_id
+    :return: ec2's global ip
+    """
     ec2_global_ip = ""
     # instance_id = "i-073ae94f0d3e7b4d3"
     temp = boto.ec2.connect_to_region(region)  # check here for the new error
@@ -115,7 +124,6 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
     # IMPORTANT- without chmod 400 (etc) the ssh will not work due to too open access to the key file.
     sudo_password = "echo " + sudo_pass + " | sudo -S "
     commands1 = sudo_password + "sudo chmod 400 " + "/home/idan/PycharmProjects/pythonProject/" + key_pair_name + ".pem"
-    # commands1 = sudo_password + "sudo chmod 400 " + key_pair_name + ".pem"
     output = subprocess.getoutput(commands1)  # ill change the path later
 
     username = "ubuntu"  # may get this as parameter later on
@@ -142,24 +150,25 @@ def ssh_operations(ec2_global_ip, key_pair_name, sudo_pass, file_path_to_pass, d
 def main():
     key_pair_name = "idan15"  # without .pem
     sudo_password = "Idan2408"
-
+    group_name = "idantest31"
     vpc_id = get_vpc()
     print(vpc_id)
 
-    #security_group_id = security_group_settings(vpc_id, "idantest31")
-    #print(security_group_id)
+    security_group_id = security_group_settings(vpc_id, group_name)
+    print(security_group_id)
 
-    #instance_id = create_ec2(security_group_id, key_pair_name)
-    #print("instance id: ", instance_id)
-    instance_id = "i-0a70851a2af9eec29"
+    instance_id = create_ec2(security_group_id, key_pair_name)
+    print("instance id: ", instance_id)
+    # instance_id = "i-0a70851a2af9eec29"
 
     global_ip = instance_id_ip(instance_id)
     print("instace global ip:", global_ip)  # global ip of the new machine
     time.sleep(20)
-    a = Creator("us-east-2", instance_id,  "i-0e379dc5b2efc913c")  # (region, ec2 just created, ec2 to snap from)
+    ec2_to_snap_from = "i-0e379dc5b2efc913c" # id of the ec2 we want to scan.
+    a = Creator("us-east-2", instance_id,  ec2_to_snap_from)  # (region, ec2 just created, ec2 to snap from)
     a.create_and_attach_volume_from_snapshot()
-    ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/commands.py", "/home/ubuntu/test.py")
-    ssh_operations(global_ip, key_pair_name, sudo_password, "/home/idan/PycharmProjects/pythonProject/main_elk.py", "/home/ubuntu/test1.py")
+    ssh_operations(global_ip, key_pair_name, sudo_password, "/commands.py", "/home/ubuntu/test.py")
+    ssh_operations(global_ip, key_pair_name, sudo_password, "/main_elk.py", "/home/ubuntu/test1.py")
 
     print("main file took to execute: ", time.time()-start_time, " S")  # about 10 minutes +-
 
@@ -167,11 +176,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-# todo: set ssh to the new volume.(follow the remote vuls tutorial)
-# todo: (use the ssh used to connect to the new ec2 probably) ->
-# todo: try to connect to it from the new ec2. ->
-# todo: the kibana code is commented for now- need to check on remote kibana server.
 
 """
 If getting this error:
